@@ -3,151 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة صائد القطط 🐱</title>
+    <title>لعبة صائد التفاح 🍎</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #1e1e2f;
+            background-color: #1a1a2e;
             color: white;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             user-select: none;
+            overflow: hidden;
         }
 
         h1 { 
-            margin-bottom: 10px; 
+            margin: 5px 0; 
             color: #ff6b6b; 
+            font-size: 24px;
         }
 
         .stats {
             display: inline-flex;
             justify-content: center;
-            gap: 30px;
-            font-size: 22px;
-            margin-bottom: 20px;
-            background: #2b2b40;
-            padding: 10px 20px;
-            border-radius: 12px;
+            gap: 20px;
+            font-size: 18px;
+            margin-bottom: 10px;
+            background: #16213e;
+            padding: 8px 15px;
+            border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         #game-area {
-            width: 90%;
-            max-width: 450px;
-            height: 400px;
-            background-color: #2b2b40;
-            border: 3px solid #ff6b6b;
-            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            height: 420px;
+            background: linear-gradient(to bottom, #0f3460, #1a1a2e);
+            border: 3px solid #e94560;
+            border-radius: 15px;
             margin: 0 auto;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            touch-action: none;
         }
 
-        #cat {
-            font-size: 55px;
+        .apple {
+            font-size: 35px;
             position: absolute;
             cursor: pointer;
-            display: none;
-            transition: transform 0.1s;
         }
 
-        #cat:active {
-            transform: scale(0.8);
+        .bomb {
+            font-size: 35px;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        #basket {
+            font-size: 50px;
+            position: absolute;
+            bottom: 10px;
+            left: 175px;
+            cursor: pointer;
+            transition: transform 0.05s linear;
         }
 
         button {
-            margin-top: 20px;
-            padding: 12px 35px;
-            font-size: 20px;
-            background-color: #4ecdc4;
-            color: #1e1e2f;
+            margin-top: 15px;
+            padding: 10px 30px;
+            font-size: 18px;
+            background-color: #e94560;
+            color: white;
             font-weight: bold;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            box-shadow: 0 4px 10px rgba(233, 69, 96, 0.4);
         }
 
         button:hover { 
-            background-color: #45b7af; 
+            background-color: #ff6b6b; 
         }
     </style>
 </head>
 <body>
 
-    <h1>لعبة صائد القطط 🐱</h1>
+    <h1>لعبة صائد التفاح 🍎</h1>
     
     <div class="stats">
         <div>النقاط: <span id="score">0</span></div>
-        <div>الوقت: <span id="time">30</span> ث</div>
+        <div>الأرواح ❤️: <span id="lives">3</span></div>
     </div>
 
-    <div id="game-area">
-        <div id="cat" onclick="catchCat()">🐱</div>
+    <div id="game-area" onmousemove="moveBasket(event)" ontouchmove="moveBasketTouch(event)">
+        <div id="basket">🧺</div>
     </div>
 
-    <button id="start-btn" onclick="startGame()">ابدأ اللعب</button>
+    <button id="start-btn" onclick="startGame()">ابدأ التحدي</button>
 
     <script>
         let score = 0;
-        let timeLeft = 30;
-        let gameTimer;
-        let moveTimer;
-        
-        const cat = document.getElementById('cat');
+        let lives = 3;
+        let gameInterval;
+        let itemInterval;
+        let isPlaying = false;
+
         const gameArea = document.getElementById('game-area');
+        const basket = document.getElementById('basket');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
         const startBtn = document.getElementById('start-btn');
+
+        let basketX = 175;
 
         function startGame() {
             score = 0;
-            timeLeft = 30;
-            document.getElementById('score').innerText = score;
-            document.getElementById('time').innerText = timeLeft;
-            
+            lives = 3;
+            scoreDisplay.innerText = score;
+            livesDisplay.innerText = lives;
             startBtn.style.display = 'none';
-            cat.style.display = 'block';
+            isPlaying = true;
+            basketX = 175;
+            basket.style.left = basketX + 'px';
+
+            // إزالة أي عناصر قديمة
+            document.querySelectorAll('.apple, .bomb').forEach(e => e.remove());
+
+            itemInterval = setInterval(spawnItem, 800);
+            gameInterval = setInterval(updateGame, 20);
+        }
+
+        function moveBasket(e) {
+            if (!isPlaying) return;
+            const rect = gameArea.getBoundingClientRect();
+            basketX = e.clientX - rect.left - 25;
+            if (basketX < 0) basketX = 0;
+            if (basketX > gameArea.clientWidth - 50) basketX = gameArea.clientWidth - 50;
+            basket.style.left = basketX + 'px';
+        }
+
+        function moveBasketTouch(e) {
+            if (!isPlaying) return;
+            const rect = gameArea.getBoundingClientRect();
+            let touchX = e.touches[0].clientX;
+            basketX = touchX - rect.left - 25;
+            if (basketX < 0) basketX = 0;
+            if (basketX > gameArea.clientWidth - 50) basketX = gameArea.clientWidth - 50;
+            basket.style.left = basketX + 'px';
+        }
+
+        function spawnItem() {
+            if (!isPlaying) return;
+            const item = document.createElement('div');
+            const isBomb = Math.random() < 0.25; // نسبة القنابل 25%
+            item.classList.add(isBomb ? 'bomb' : 'apple');
+            item.innerHTML = isBomb ? '💣' : '🍎';
             
-            moveCat();
+            const randomX = Math.floor(Math.random() * (gameArea.clientWidth - 40));
+            item.style.left = randomX + 'px';
+            item.style.top = '-40px';
             
-            moveTimer = setInterval(moveCat, 900);
-            
-            gameTimer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('time').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    endGame();
+            gameArea.appendChild(item);
+        }
+
+        function updateGame() {
+            if (!isPlaying) return;
+
+            const items = document.querySelectorAll('.apple, .bomb');
+            items.forEach(item => {
+                let currentTop = parseFloat(item.style.top);
+                item.style.top = (currentTop + 4) + 'px'; // سرعة سقوط العناصر
+
+                let itemX = parseFloat(item.style.left);
+                let itemY = currentTop;
+
+                // التحقق من الاصطدام بالسلة
+                if (itemY >= 340 && itemY <= 390 && itemX >= basketX - 25 && itemX <= basketX + 40) {
+                    if (item.classList.contains('apple')) {
+                        score += 10;
+                        scoreDisplay.innerText = score;
+                    } else {
+                        lives--;
+                        livesDisplay.innerText = lives;
+                        if (lives <= 0) {
+                            endGame();
+                        }
+                    }
+                    item.remove();
+                } 
+                // إذا سقط العنصر بالأسفل ولم يُلتقط
+                else if (itemY > 410) {
+                    if (item.classList.contains('apple')) {
+                        lives--;
+                        livesDisplay.innerText = lives;
+                        if (lives <= 0) {
+                            endGame();
+                        }
+                    }
+                    item.remove();
                 }
-            }, 1000);
-        }
-
-        function moveCat() {
-            const maxX = gameArea.clientWidth - 70;
-            const maxY = gameArea.clientHeight - 70;
-            const randomX = Math.floor(Math.random() * maxX);
-            const randomY = Math.floor(Math.random() * maxY);
-            
-            cat.style.left = randomX + 'px';
-            cat.style.top = randomY + 'px';
-        }
-
-        function catchCat() {
-            score++;
-            document.getElementById('score').innerText = score;
-            moveCat();
-            
-            clearInterval(moveTimer);
-            moveTimer = setInterval(moveCat, 900);
+            });
         }
 
         function endGame() {
-            clearInterval(gameTimer);
-            clearInterval(moveTimer);
-            cat.style.display = 'none';
+            isPlaying = false;
+            clearInterval(gameInterval);
+            clearInterval(itemInterval);
+            document.querySelectorAll('.apple, .bomb').forEach(e => e.remove());
             startBtn.style.display = 'inline-block';
-            startBtn.innerText = 'العب مرة أخرى';
-            alert('انتهى الوقت! مجموع نقاطك هو: ' + score + ' 🐱🎉');
+            startBtn.innerText = 'العب مجدداً';
+            alert('انتهت اللعبة! مجموع نقاطك: ' + score + ' 🍎✨');
         }
     </script>
 
