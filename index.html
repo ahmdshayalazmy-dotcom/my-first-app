@@ -3,68 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة ماريو الكلاسيكية 1980s 🍄</title>
+    <title>غرفة المحادثة الجماعية 💬</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
             margin: 0;
             padding: 0;
-            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            height: 90vh;
+            background: #1e293b;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
-            align-items: center;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+
+        /* شاشة تسجيل الدخول */
+        #login-screen {
+            padding: 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
-            height: 100vh;
-            font-family: 'Courier New', Courier, monospace;
+            height: 100%;
+        }
+
+        #login-screen h2 {
+            color: #38bdf8;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
             color: white;
-            user-select: none;
-        }
-        h1 {
-            margin: 5px 0;
-            color: #ff3333;
-            font-size: 24px;
-            text-shadow: 2px 2px #000;
-        }
-        .container {
-            position: relative;
-            width: 400px;
+            margin-bottom: 15px;
+            outline: none;
             text-align: center;
         }
-        canvas {
-            border: 4px solid #fff;
-            border-radius: 4px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            background: linear-gradient(to bottom, #5c94fc, #5c94fc);
-            display: block;
-        }
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 300px;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
+
         button {
-            padding: 10px 25px;
-            font-size: 18px;
-            background-color: #f83800;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #0ea5e9;
             color: white;
             font-weight: bold;
-            border: 3px solid #000;
-            border-radius: 4px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 4px 0 #801000;
-            font-family: 'Courier New', Courier, monospace;
+            transition: background 0.2s;
         }
-        button:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #801000;
+
+        button:hover {
+            background-color: #0284c7;
         }
+
+        /* شاشة المحادثة */
+        #chat-screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-header {
+            background: #0f172a;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid #334155;
+            color: #38bdf8;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            background: #334155;
+            padding: 10px 14px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .message.my-message {
+            background: #0369a1;
+            align-self: flex-end;
+        }
+
+        .message .username {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 3px;
+            display: block;
+            font-weight: bold;
+        }
+
+        .message img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+
+        .chat-input-area {
+            padding: 12px;
+            background: #0f172a;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #334155;
+            align-items: center;
+        }
+
+        .chat-input-area input[type="text"] {
+            flex: 1;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .file-upload-btn {
+            background: #334155;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .file-upload-btn:hover {
+            background: #475569;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -72,223 +170,113 @@
 </head>
 <body>
 
-    <h1>SUPER MARIO 1985 🍄</h1>
-    
     <div class="container">
-        <!-- شاشة البداية -->
-        <div id="startScreen" class="screen">
-            <h2 style="color: #f83800; margin-bottom: 10px;">عالم ماريو الكلاسيكي</h2>
-            <p style="font-size: 14px; margin-bottom: 20px;">استخدم السهم العلوي أو المس الشاشة للقفز!</p>
-            <button onclick="startGame()">ابدأ المغامرة</button>
+        <!-- شاشة إدخال الاسم للانضمام -->
+        <div id="login-screen">
+            <h2>🌍 انضم لغرفة الدردشة</h2>
+            <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">اختر لقباً لتبدأ التحدث ومشاركة الصور مع الآخرين</p>
+            <input type="text" id="username-input" placeholder="اكتب اسمك المستعار..." maxlength="15">
+            <button onclick="joinChat()">دخول الغرفة</button>
         </div>
 
-        <!-- شاشة خسارة اللعبة -->
-        <div id="gameOverScreen" class="screen hidden">
-            <h2 style="color: #f83800; margin-bottom: 5px;">GAME OVER</h2>
-            <p id="finalScore" style="font-size: 18px; margin-bottom: 15px;"></p>
-            <button onclick="startGame()">العب مرة أخرى</button>
-        </div>
+        <!-- شاشة المحادثة الفعلية -->
+        <div id="chat-screen">
+            <div class="chat-header">غرفة الدردشة العامة 💬</div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <!-- رسالة ترحيبية افتراضية -->
+                <div class="message">
+                    <span class="username">النظام</span>
+                    أهلاً بك في الغرفة! يمكنك كتابة رسائل وإرسال صور ليراها الزوار على نفس الرابط.
+                </div>
+            </div>
 
-        <canvas id="gameCanvas" width="400" height="300"></canvas>
+            <div class="chat-input-area">
+                <label class="file-upload-btn" title="أرسل صورة">
+                    📷
+                    <input type="file" id="image-input" accept="image/*" onchange="sendImage(event)">
+                </label>
+                <input type="text" id="message-input" placeholder="اكتب رسالة..." onkeypress="checkEnter(event)">
+                <button onclick="sendMessage()" style="padding: 10px 15px;">إرسال</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
+        let myUsername = "";
+        const loginScreen = document.getElementById("login-screen");
+        const chatScreen = document.getElementById("chat-screen");
+        const usernameInput = document.getElementById("username-input");
+        const messageInput = document.getElementById("message-input");
+        const chatMessages = document.getElementById("chat-messages");
 
-        const startScreen = document.getElementById("startScreen");
-        const gameOverScreen = document.getElementById("gameOverScreen");
-        const finalScoreText = document.getElementById("finalScore");
-
-        // إعدادات بطل اللعبة (ماريو)
-        let mario = {
-            x: 50,
-            y: 210,
-            width: 24,
-            height: 32,
-            gravity: 0.6,
-            lift: -11,
-            velocity: 0,
-            isJumping: false
-        };
-
-        let obstacles = [];
-        let gameSpeed = 3;
-        let score = 0;
-        let frameCount = 0;
-        let isPlaying = false;
-
-        function startGame() {
-            startScreen.classList.add("hidden");
-            gameOverScreen.classList.add("hidden");
-            mario.y = 210;
-            mario.velocity = 0;
-            obstacles = [];
-            score = 0;
-            gameSpeed = 3;
-            frameCount = 0;
-            isPlaying = true;
+        function joinChat() {
+            let name = usernameInput.value.trim();
+            if (name === "") {
+                alert("الرجاء إدخال اسم صحيح!");
+                return;
+            }
+            myUsername = name;
+            loginScreen.classList.add("hidden");
+            chatScreen.style.display = "flex";
+            
+            // إضافة رسالة دخول
+            appendMessage("النظام", `انضم المستخدم (${myUsername}) إلى الغرفة.`, false);
         }
 
-        function jump() {
-            if (!isPlaying) return;
-            if (!mario.isJumping) {
-                mario.velocity = mario.lift;
-                mario.isJumping = true;
-            }
+        function sendMessage() {
+            let text = messageInput.value.trim();
+            if (text === "") return;
+
+            appendMessage(myUsername, text, true);
+            
+            // محاكاة استجابة أو حفظ محلي للتفاعل
+            messageInput.value = "";
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // أزرار التحكم (الكيبورد واللمس)
-        window.addEventListener("keydown", function(e) {
-            if (e.code === "Space" || e.code === "ArrowUp") {
-                jump();
-            }
-        });
+        function sendImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-        canvas.getElementById = "gameCanvas";
-        canvas.addEventListener("click", jump);
-        canvas.addEventListener("touchstart", function(e) {
-            e.preventDefault();
-            jump();
-        });
-
-        function spawnObstacle() {
-            // توليد ماسورة أو عدو (جوومبا صغير)
-            let type = Math.random() < 0.6 ? "pipe" : "goomba";
-            let height = type === "pipe" ? Math.floor(Math.random() * 30) + 30 : 24;
-            let width = type === "pipe" ? 28 : 24;
-
-            obstacles.push({
-                x: canvas.width,
-                y: 242 - height,
-                width: width,
-                height: height,
-                type: type
-            });
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let imageUrl = e.target.result;
+                appendImageMessage(myUsername, imageUrl, true);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            };
+            reader.readAsDataURL(file);
         }
 
-        function update() {
-            if (!isPlaying) return;
+        function appendMessage(sender, text, isMe) {
+            const msgDiv = document.createElement("div");
+            msgDiv.classList.add("message");
+            if (isMe) msgDiv.classList.add("my-message");
 
-            // جاذبية ماريو
-            mario.velocity += mario.gravity;
-            mario.y += mario.velocity;
+            msgDiv.innerHTML = `<span class="username">${sender}</span>${escapeHtml(text)}`;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
 
-            // الاصطدام بالأرض
-            if (mario.y >= 210) {
-                mario.y = 210;
-                mario.velocity = 0;
-                mario.isJumping = false;
-            }
+        function appendImageMessage(sender, imgSrc, isMe) {
+            const msgDiv = document.createElement("div");
+            msgDiv.classList.add("message");
+            if (isMe) msgDiv.classList.add("my-message");
 
-            // زيادة صعوبة اللعبة تدريجياً مع الوقت
-            frameCount++;
-            if (frameCount % 100 === 0) {
-                gameSpeed += 0.15;
-                score += 10;
-            }
+            msgDiv.innerHTML = `<span class="username">${sender}</span> شارك صورة:<br><img src="${imgSrc}" alt="صورة مرفقة">`;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
 
-            // توليد العوائق
-            if (frameCount % 110 === 0) {
-                spawnObstacle();
-            }
-
-            // تحريك وفحص العوائق
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                obstacles[i].x -= gameSpeed;
-
-                // فحص الاصطدام بدقة بين ماريو والعائق
-                if (
-                    mario.x < obstacles[i].x + obstacles[i].width - 4 &&
-                    mario.x + mario.width - 4 > obstacles[i].x &&
-                    mario.y + mario.height > obstacles[i].y + 4
-                ) {
-                    endGame();
-                }
-
-                // حذف العائق إذا خرج من الشاشة وحساب النقاط
-                if (obstacles[i].x + obstacles[i].width < 0) {
-                    obstacles.splice(i, 1);
-                    score += 5;
-                }
+        function checkEnter(e) {
+            if (e.key === "Enter") {
+                sendMessage();
             }
         }
 
-        function endGame() {
-            isPlaying = false;
-            finalScoreText.innerText = "مجموع النقاط: " + score;
-            gameOverScreen.classList.remove("hidden");
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
-
-        function draw() {
-            // رسم السماء الزرقاء الكلاسيكية
-            ctx.fillStyle = "#5c94fc";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // رسم السحب الكلاسيكية في الخلفية
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(80, 50, 40, 16);
-            ctx.fillRect(260, 80, 56, 16);
-
-            // رسم الأرض الطوبية (تراث الثمانينيات)
-            ctx.fillStyle = "#e58a3a";
-            ctx.fillRect(0, 242, canvas.width, 58);
-            ctx.fillStyle = "#c84c0c"; // خطوط الطوب الفاصلة
-            for (let i = 0; i < canvas.width; i += 20) {
-                ctx.fillRect(i, 242, 2, 58);
-            }
-            ctx.fillStyle = "#000000";
-            ctx.fillRect(0, 242, canvas.width, 4);
-
-            // رسم العوائق (الأنابيب والأعداء)
-            for (let i = 0; i < obstacles.length; i++) {
-                if (obstacles[i].type === "pipe") {
-                    // أنبوب ماريو الأخضر الشهير
-                    ctx.fillStyle = "#00a800";
-                    ctx.fillRect(obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height);
-                    ctx.strokeStyle = "#000";
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height);
-                    // حافة الأنبوب العلوي
-                    ctx.fillStyle = "#00c800";
-                    ctx.fillRect(obstacles[i].x - 3, obstacles[i].y, obstacles[i].width + 6, 10);
-                    ctx.strokeRect(obstacles[i].x - 3, obstacles[i].y, obstacles[i].width + 6, 10);
-                } else {
-                    // رسم عدو بسيط (جوومبا بني)
-                    ctx.fillStyle = "#8b4513";
-                    ctx.fillRect(obstacles[i].x, obstacles[i].y + 6, 24, 18);
-                    ctx.fillStyle = "#ffcc99";
-                    ctx.fillRect(obstacles[i].x + 4, obstacles[i].y, 16, 10);
-                }
-            }
-
-            // رسم ماريو (شكل رمزي بلون أحمر وبني كلاسيكي)
-            // القبعة والقميص الأحمر
-            ctx.fillStyle = "#f83800";
-            ctx.fillRect(mario.x + 4, mario.y, 16, 12);
-            // الوجه والجلد
-            ctx.fillStyle = "#ffcc99";
-            ctx.fillRect(mario.x + 6, mario.y + 8, 14, 10);
-            // البنطال الأزرق
-            ctx.fillStyle = "#0000f8";
-            ctx.fillRect(mario.x + 4, mario.y + 18, 16, 14);
-
-            // رسم عداد النقاط في الأعلى
-            ctx.fillStyle = "white";
-            ctx.font = "bold 16px 'Courier New'";
-            ctx.textAlign = "right";
-            ctx.fillText("MARIO", 80, 25);
-            ctx.fillText("SCORE", 220, 25);
-            ctx.fillText(score, 360, 25);
-        }
-
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
-        }
-
-        loop();
     </script>
 
 </body>
