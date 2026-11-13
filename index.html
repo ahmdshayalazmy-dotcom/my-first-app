@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة فلاتر الطير الصعبة 🐦</title>
+    <title>لعبة فلاتر الطير مع المتصدرين 🐦🏆</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #222;
+            background-color: #1a1a2e;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -19,9 +19,14 @@
             user-select: none;
         }
         h1 {
-            margin: 5px 0 10px 0;
+            margin: 5px 0;
             color: #ffeb3b;
             font-size: 22px;
+        }
+        .container {
+            position: relative;
+            width: 320px;
+            text-align: center;
         }
         canvas {
             border: 4px solid #fff;
@@ -29,44 +34,167 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             background: linear-gradient(to bottom, #4ec0ca, #87ceeb);
             cursor: pointer;
+            display: block;
+        }
+        /* نافذة إدخال الاسم ولوحة الشرف */
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 480px;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            text-align: center;
+            margin-bottom: 15px;
+            width: 80%;
+            outline: none;
+        }
+        button {
+            padding: 10px 25px;
+            font-size: 18px;
+            background-color: #ff6b6b;
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255,107,107,0.4);
+        }
+        button:hover {
+            background-color: #ff5252;
+        }
+        .leaderboard {
+            margin-top: 10px;
+            background: #16213e;
+            padding: 8px;
+            border-radius: 8px;
+            width: 85%;
+            font-size: 14px;
+            text-align: right;
+            border: 1px solid #4ec0ca;
+        }
+        .leaderboard h3 {
+            margin: 0 0 5px 0;
+            font-size: 15px;
+            color: #ffeb3b;
+            text-align: center;
+        }
+        .leaderboard ol {
+            margin: 0;
+            padding-right: 20px;
+        }
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
 
-    <h1>لعبة فلاتر الطير الصعبة 🐦🔥</h1>
-    <canvas id="gameCanvas" width="320" height="480"></canvas>
+    <h1>لعبة فلاتر الطير الصعبة 🐦🏆</h1>
+    
+    <div class="container">
+        <!-- شاشة البداية وإدخال الاسم -->
+        <div id="startScreen" class="overlay-screen">
+            <h2 style="color: #4ec0ca; margin-bottom: 10px;">أدخل اسمك للتحدي</h2>
+            <input type="text" id="playerName" placeholder="اكتب اسمك هنا..." maxlength="12">
+            <button onclick="startApp()">ابدأ اللعبة</button>
+        </div>
+
+        <!-- شاشة نهاية اللعبة ولوحة التصنيف -->
+        <div id="gameOverScreen" class="overlay-screen hidden">
+            <h2 style="color: #ff6b6b; margin: 0 0 5px 0;">انتهت اللعبة! 💥</h2>
+            <p id="finalScoreText" style="margin: 5px 0 10px 0; font-size: 18px;"></p>
+            
+            <div class="leaderboard">
+                <h3>🏆 لوحة الشرف (أعلى النقاط)</h3>
+                <ol id="highScoresList"></ol>
+            </div>
+
+            <button style="margin-top: 15px;" onclick="restartGame()">العب مرة أخرى</button>
+        </div>
+
+        <canvas id="gameCanvas" width="320" height="480"></canvas>
+    </div>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // إعدادات الطائر
-        let bird = {
-            x: 50,
-            y: 150,
-            width: 30,
-            height: 24,
-            gravity: 0.55,     // الجاذبية (تجعله يسقط بسرعة)
-            lift: -9,          // قوة القفزة
-            velocity: 0
-        };
+        const startScreen = document.getElementById("startScreen");
+        const gameOverScreen = document.getElementById("gameOverScreen");
+        const playerNameInput = document.getElementById("playerName");
+        const finalScoreText = document.getElementById("finalScoreText");
+        const highScoresList = document.getElementById("highScoresList");
 
+        let currentName = "لاعب";
+        let bird = { x: 50, y: 150, width: 30, height: 24, gravity: 0.55, lift: -9, velocity: 0 };
         let pipes = [];
         let pipeWidth = 50;
-        let pipeGap = 110;     // الفجوة ضيقة وصعبة جداً!
+        let pipeGap = 110; // فجوة ضعبة وصعبة
         let frameCount = 0;
         let score = 0;
-        let highScore = 0;
-        let isGameOver = true;
+        let isPlaying = false;
 
-        // بدء اللعبة أو القفز عند النقر أو لمس الشاشة
-        function triggerAction() {
-            if (isGameOver) {
-                resetGame();
-            } else {
-                bird.velocity = bird.lift;
+        function startApp() {
+            let nameVal = playerNameInput.value.trim();
+            if (nameVal !== "") {
+                currentName = nameVal;
             }
+            startScreen.classList.add("hidden");
+            resetGameValues();
+            isPlaying = true;
+        }
+
+        function resetGameValues() {
+            bird.y = 150;
+            bird.velocity = 0;
+            pipes = [];
+            score = 0;
+            frameCount = 0;
+            gameOverScreen.classList.add("hidden");
+        }
+
+        function restartGame() {
+            resetGameValues();
+            isPlaying = true;
+        }
+
+        // حفظ وعرض لوحة الشرف
+        function saveScoreAndShowLeaderboard(scoreVal) {
+            let scores = JSON.parse(localStorage.getItem("flappy_scores") || "[]");
+            scores.push({ name: currentName, score: scoreVal });
+            
+            // ترتيب النتائج تنازلياً (الأعلى أولاً)
+            scores.sort((a, b) => b.score - a.score);
+            
+            // الاحتفاظ بأعلى 5 نتائج فقط
+            scores = scores.slice(0, 5);
+            localStorage.setItem("flappy_scores", JSON.stringify(scores));
+
+            // تحديث القائمة في الواجهة
+            highScoresList.innerHTML = "";
+            scores.forEach((item, index) => {
+                let li = document.createElement("li");
+                li.innerText = `${item.name}: ${item.score} نقطة`;
+                highScoresList.appendChild(li);
+            });
+        }
+
+        function triggerAction() {
+            if (!isPlaying) return;
+            bird.velocity = bird.lift;
         }
 
         window.addEventListener("keydown", function(e) {
@@ -81,17 +209,7 @@
             triggerAction();
         });
 
-        function resetGame() {
-            bird.y = 150;
-            bird.velocity = 0;
-            pipes = [];
-            score = 0;
-            frameCount = 0;
-            isGameOver = false;
-        }
-
         function spawnPipe() {
-            // ارتفاع عشوائي للأنابيب مع مسافة صعبة للتحدي
             let minHeight = 50;
             let maxHeight = canvas.height - pipeGap - 80;
             let topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
@@ -105,48 +223,40 @@
         }
 
         function update() {
-            if (isGameOver) return;
+            if (!isPlaying) return;
 
-            // تطبيق الجاذبية على الطائر
             bird.velocity += bird.gravity;
             bird.y += bird.velocity;
 
-            // اصطدام الطائر بالأرض أو السقف
             if (bird.y + bird.height >= canvas.height - 20) {
                 bird.y = canvas.height - 20 - bird.height;
-                isGameOver = true;
+                endGame();
             }
             if (bird.y <= 0) {
                 bird.y = 0;
                 bird.velocity = 0;
             }
 
-            // توليد أنابيب جديدة كل 90 إطار
             if (frameCount % 90 === 0) {
                 spawnPipe();
             }
 
-            // تحريك الأنابيب وفحص الاصطدام
             for (let i = pipes.length - 1; i >= 0; i--) {
-                pipes[i].x -= 2.5; // سرعة تحرك الأنابيب
+                pipes[i].x -= 2.5;
 
-                // التحقق من احتساب النقاط
                 if (!pipes[i].passed && pipes[i].x + pipeWidth < bird.x) {
                     score++;
-                    if (score > highScore) highScore = score;
                     pipes[i].passed = true;
                 }
 
-                // فحص الاصطدام بدقة مع الأنابيب (الطائر والأنابيب)
                 if (
                     bird.x < pipes[i].x + pipeWidth &&
                     bird.x + bird.width > pipes[i].x &&
                     (bird.y < pipes[i].top || bird.y + bird.height > canvas.height - pipes[i].bottom)
                 ) {
-                    isGameOver = true;
+                    endGame();
                 }
 
-                // حذف الأنابيب التي خرجت من الشاشة
                 if (pipes[i].x + pipeWidth < 0) {
                     pipes.splice(i, 1);
                 }
@@ -155,40 +265,43 @@
             frameCount++;
         }
 
+        function endGame() {
+            isPlaying = false;
+            finalScoreText.innerText = `اللاعب: ${currentName} | النقاط: ${score}`;
+            saveScoreAndShowLeaderboard(score);
+            gameOverScreen.classList.remove("hidden");
+        }
+
         function draw() {
-            // مسح الشاشة (السماء)
             ctx.fillStyle = "#70c5ce";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // رسم الأنابيب الخضراء
+            // رسم الأنابيب
             for (let i = 0; i < pipes.length; i++) {
                 ctx.fillStyle = "#73bf2e";
                 ctx.strokeStyle = "#558022";
                 ctx.lineWidth = 2;
 
-                // الأنبوب العلوي
                 ctx.fillRect(pipes[i].x, 0, pipeWidth, pipes[i].top);
                 ctx.strokeRect(pipes[i].x, 0, pipeWidth, pipes[i].top);
 
-                // الأنبوب السفلي
                 ctx.fillRect(pipes[i].x, canvas.height - pipes[i].bottom, pipeWidth, pipes[i].bottom);
                 ctx.strokeRect(pipes[i].x, canvas.height - pipes[i].bottom, pipeWidth, pipes[i].bottom);
             }
 
-            // رسم الأرضية في الأسفل
+            // رسم الأرضية
             ctx.fillStyle = "#ded895";
             ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
             ctx.fillStyle = "#558022";
             ctx.fillRect(0, canvas.height - 20, canvas.width, 5);
 
-            // رسم الطائر (على شكل طائر أصفر بملامح واضحة)
+            // رسم الطائر
             ctx.fillStyle = "#f8e71c";
             ctx.beginPath();
             ctx.arc(bird.x + bird.width/2, bird.y + bird.height/2, bird.width/2, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
 
-            // العين
             ctx.fillStyle = "white";
             ctx.beginPath();
             ctx.arc(bird.x + bird.width - 8, bird.y + 7, 5, 0, Math.PI * 2);
@@ -198,7 +311,6 @@
             ctx.arc(bird.x + bird.width - 7, bird.y + 7, 2, 0, Math.PI * 2);
             ctx.fill();
 
-            // المنقار
             ctx.fillStyle = "#f57c00";
             ctx.beginPath();
             ctx.moveTo(bird.x + bird.width, bird.y + 10);
@@ -206,29 +318,12 @@
             ctx.lineTo(bird.x + bird.width, bird.y + 16);
             ctx.fill();
 
-            // رسم النقاط
-            ctx.fillStyle = "white";
-            ctx.font = "bold 28px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText(score, canvas.width / 2, 50);
-
-            // رسالة البداية أو الخسارة
-            if (isGameOver) {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+            // رسم النقاط الحالية أثناء اللعب
+            if (isPlaying) {
                 ctx.fillStyle = "white";
-                ctx.font = "bold 26px Arial";
-                ctx.fillText(score === 0 ? "اضغط للبدء 🐦" : "انتهت اللعبة! 💥", canvas.width / 2, canvas.height / 2 - 30);
-                
-                if (score > 0) {
-                    ctx.font = "18px Arial";
-                    ctx.fillText("النقاط: " + score + " | أعلى رقم: " + highScore, canvas.width / 2, canvas.height / 2 + 10);
-                }
-
-                ctx.font = "14px Arial";
-                ctx.fillStyle = "#ffeb3b";
-                ctx.fillText("انقر أو المس الشاشة للقفز", canvas.width / 2, canvas.height / 2 + 50);
+                ctx.font = "bold 28px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(score, canvas.width / 2, 50);
             }
         }
 
