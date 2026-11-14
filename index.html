@@ -1,283 +1,254 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>غرفة المحادثة الجماعية 💬</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 450px;
-            height: 90vh;
-            background: #1e293b;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 1px solid #334155;
-        }
-
-        /* شاشة تسجيل الدخول */
-        #login-screen {
-            padding: 30px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
-        }
-
-        #login-screen h2 {
-            color: #38bdf8;
-            margin-bottom: 20px;
-        }
-
-        input[type="text"] {
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 1px solid #475569;
-            background: #0f172a;
-            color: white;
-            margin-bottom: 15px;
-            outline: none;
-            text-align: center;
-        }
-
-        button {
-            padding: 12px;
-            font-size: 16px;
-            background-color: #0ea5e9;
-            color: white;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background-color: #0284c7;
-        }
-
-        /* شاشة المحادثة */
-        #chat-screen {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .chat-header {
-            background: #0f172a;
-            padding: 15px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            border-bottom: 1px solid #334155;
-            color: #38bdf8;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .message {
-            background: #334155;
-            padding: 10px 14px;
-            border-radius: 10px;
-            max-width: 80%;
-            word-wrap: break-word;
-            position: relative;
-        }
-
-        .message.my-message {
-            background: #0369a1;
-            align-self: flex-end;
-        }
-
-        .message .username {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 3px;
-            display: block;
-            font-weight: bold;
-        }
-
-        .message img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-top: 5px;
-            cursor: pointer;
-        }
-
-        .chat-input-area {
-            padding: 12px;
-            background: #0f172a;
-            display: flex;
-            gap: 10px;
-            border-top: 1px solid #334155;
-            align-items: center;
-        }
-
-        .chat-input-area input[type="text"] {
-            flex: 1;
-            margin: 0;
-            padding: 10px;
-        }
-
-        .file-upload-btn {
-            background: #334155;
-            padding: 10px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .file-upload-btn:hover {
-            background: #475569;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>صائد النجوم</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+    body {
+      background: #0b1021;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      gap: 14px;
+    }
+    .panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      background: #151e3d;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid #29386b;
+    }
+    input, button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 15px;
+    }
+    input {
+      background: #0b1021;
+      color: #fff;
+      border: 1px solid #384c8f;
+      width: 150px;
+    }
+    button {
+      background: #38bdf8;
+      color: #061326;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { background: #7dd3fc; }
+    .hud {
+      display: flex;
+      gap: 20px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    canvas {
+      background: radial-gradient(circle at top, #1b2754, #090d1a);
+      border: 2px solid #334685;
+      border-radius: 14px;
+      max-width: 100%;
+      touch-action: none;
+    }
+    .board {
+      background: #151e3d;
+      padding: 12px 18px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 460px;
+      border: 1px solid #29386b;
+    }
+    .board h3 { margin-bottom: 8px; font-size: 16px; color: #38bdf8; }
+    ol { padding-right: 20px; }
+    li { margin: 4px 0; font-size: 14px; }
+  </style>
 </head>
 <body>
+  <h1>صائد النجوم</h1>
 
-    <div class="container">
-        <!-- شاشة إدخال الاسم للانضمام -->
-        <div id="login-screen">
-            <h2>🌍 انضم لغرفة الدردشة</h2>
-            <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">اختر لقباً لتبدأ التحدث ومشاركة الصور مع الآخرين</p>
-            <input type="text" id="username-input" placeholder="اكتب اسمك المستعار..." maxlength="15">
-            <button onclick="joinChat()">دخول الغرفة</button>
-        </div>
+  <div class="panel">
+    <input id="playerName" type="text" maxlength="16" placeholder="اسم اللاعب" value="لاعب" />
+    <button id="startBtn">ابدأ اللعب</button>
+  </div>
 
-        <!-- شاشة المحادثة الفعلية -->
-        <div id="chat-screen">
-            <div class="chat-header">غرفة الدردشة العامة 💬</div>
-            
-            <div class="chat-messages" id="chat-messages">
-                <!-- رسالة ترحيبية افتراضية -->
-                <div class="message">
-                    <span class="username">النظام</span>
-                    أهلاً بك في الغرفة! يمكنك كتابة رسائل وإرسال صور ليراها الزوار على نفس الرابط.
-                </div>
-            </div>
+  <div class="hud">
+    <div>النقاط: <span id="scoreEl">0</span></div>
+    <div>المحاولات المتبقية: <span id="livesEl">3</span></div>
+  </div>
 
-            <div class="chat-input-area">
-                <label class="file-upload-btn" title="أرسل صورة">
-                    📷
-                    <input type="file" id="image-input" accept="image/*" onchange="sendImage(event)">
-                </label>
-                <input type="text" id="message-input" placeholder="اكتب رسالة..." onkeypress="checkEnter(event)">
-                <button onclick="sendMessage()" style="padding: 10px 15px;">إرسال</button>
-            </div>
-        </div>
-    </div>
+  <canvas id="gameCanvas" width="460" height="520"></canvas>
 
-    <script>
-        let myUsername = "";
-        const loginScreen = document.getElementById("login-screen");
-        const chatScreen = document.getElementById("chat-screen");
-        const usernameInput = document.getElementById("username-input");
-        const messageInput = document.getElementById("message-input");
-        const chatMessages = document.getElementById("chat-messages");
+  <div class="board">
+    <h3>أعلى النتائج</h3>
+    <ol id="scoresList"></ol>
+  </div>
 
-        function joinChat() {
-            let name = usernameInput.value.trim();
-            if (name === "") {
-                alert("الرجاء إدخال اسم صحيح!");
-                return;
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('scoreEl');
+    const livesEl = document.getElementById('livesEl');
+    const startBtn = document.getElementById('startBtn');
+    const playerNameInput = document.getElementById('playerName');
+    const scoresList = document.getElementById('scoresList');
+
+    const player = { x: 200, y: 475, w: 64, h: 16, speed: 6 };
+    let items = [];
+    let score = 0;
+    let lives = 3;
+    let running = false;
+    let keys = {};
+    let spawnTimer = 0;
+
+    async function loadScores() {
+      try {
+        const res = await fetch('/api/scores');
+        const data = await res.json();
+        scoresList.innerHTML = data
+          .map((row) => `<li>${row.name} — ${row.score}</li>`)
+          .join('');
+      } catch (_) {}
+    }
+
+    async function submitScore(finalScore) {
+      if (finalScore <= 0) return;
+      try {
+        await fetch('/api/scores', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: playerNameInput.value,
+            score: finalScore
+          })
+        });
+        await loadScores();
+      } catch (_) {}
+    }
+
+    function startGame() {
+      score = 0;
+      lives = 3;
+      items = [];
+      player.x = canvas.width / 2 - player.w / 2;
+      scoreEl.textContent = score;
+      livesEl.textContent = lives;
+      running = true;
+    }
+
+    function spawnItem() {
+      const isBomb = Math.random() < 0.25;
+      items.push({
+        x: Math.random() * (canvas.width - 28) + 14,
+        y: -14,
+        r: 12,
+        speed: 2.5 + Math.min(score * 0.04, 5),
+        isBomb
+      });
+    }
+
+    function update() {
+      if (!running) return;
+
+      if (keys['ArrowLeft'] || keys['a'] || keys['A']) player.x -= player.speed;
+      if (keys['ArrowRight'] || keys['d'] || keys['D']) player.x += player.speed;
+      player.x = Math.max(0, Math.min(canvas.width - player.w, player.x));
+
+      spawnTimer++;
+      const interval = Math.max(22, 55 - Math.floor(score / 10) * 3);
+      if (spawnTimer >= interval) {
+        spawnTimer = 0;
+        spawnItem();
+      }
+
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        item.y += item.speed;
+
+        const hit =
+          item.y + item.r >= player.y &&
+          item.y - item.r <= player.y + player.h &&
+          item.x >= player.x &&
+          item.x <= player.x + player.w;
+
+        if (hit) {
+          if (item.isBomb) {
+            lives--;
+            livesEl.textContent = lives;
+            if (lives <= 0) {
+              running = false;
+              submitScore(score);
             }
-            myUsername = name;
-            loginScreen.classList.add("hidden");
-            chatScreen.style.display = "flex";
-            
-            // إضافة رسالة دخول
-            appendMessage("النظام", `انضم المستخدم (${myUsername}) إلى الغرفة.`, false);
+          } else {
+            score += 10;
+            scoreEl.textContent = score;
+          }
+          items.splice(i, 1);
+          continue;
         }
 
-        function sendMessage() {
-            let text = messageInput.value.trim();
-            if (text === "") return;
-
-            appendMessage(myUsername, text, true);
-            
-            // محاكاة استجابة أو حفظ محلي للتفاعل
-            messageInput.value = "";
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+        if (item.y - item.r > canvas.height) {
+          items.splice(i, 1);
         }
+      }
+    }
 
-        function sendImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                let imageUrl = e.target.result;
-                appendImageMessage(myUsername, imageUrl, true);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            };
-            reader.readAsDataURL(file);
-        }
+      // Player paddle
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.roundRect(player.x, player.y, player.w, player.h, 8);
+      ctx.fill();
 
-        function appendMessage(sender, text, isMe) {
-            const msgDiv = document.createElement("div");
-            msgDiv.classList.add("message");
-            if (isMe) msgDiv.classList.add("my-message");
+      // Falling items
+      for (const item of items) {
+        ctx.beginPath();
+        ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
+        ctx.fillStyle = item.isBomb ? '#ef4444' : '#facc15';
+        ctx.fill();
+      }
 
-            msgDiv.innerHTML = `<span class="username">${sender}</span>${escapeHtml(text)}`;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+      if (!running) {
+        ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('اضغط "ابدأ اللعب"', canvas.width / 2, canvas.height / 2);
+      }
+    }
 
-        function appendImageMessage(sender, imgSrc, isMe) {
-            const msgDiv = document.createElement("div");
-            msgDiv.classList.add("message");
-            if (isMe) msgDiv.classList.add("my-message");
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
 
-            msgDiv.innerHTML = `<span class="username">${sender}</span> شارك صورة:<br><img src="${imgSrc}" alt="صورة مرفقة">`;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+    window.addEventListener('keydown', (e) => { keys[e.key] = true; });
+    window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
-        function checkEnter(e) {
-            if (e.key === "Enter") {
-                sendMessage();
-            }
-        }
+    canvas.addEventListener('pointermove', (e) => {
+      if (!running) return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const pointerX = (e.clientX - rect.left) * scaleX;
+      player.x = Math.max(0, Math.min(canvas.width - player.w, pointerX - player.w / 2));
+    });
 
-        function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-    </script>
-
+    startBtn.addEventListener('click', startGame);
+    loadScores();
+    loop();
+  </script>
 </body>
 </html>
